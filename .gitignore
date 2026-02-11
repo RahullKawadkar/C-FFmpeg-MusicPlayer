@@ -1,0 +1,23 @@
+# 1. Build Folders (Inhe GitHub par kabhi nahi dalte)
+build/
+bin/
+obj/
+
+# 2. Executables (Compiled files)
+*.exe
+*.dll
+*.pdb
+
+# 3. Local Library Manager (Ye har koi khud install karega)
+vcpkg/
+vcpkg_installed/
+
+# 4. IDE Settings (VS Code ya Visual Studio ki personal settings)
+.vscode/
+.vs/
+out/
+
+# 5. Media Files (Gane GitHub par upload nahi karte, copyright issue ho sakta hai)
+*.mp3
+*.wav
+*.aac
