@@ -2,15 +2,13 @@
 
 
 
-!\[Author](https://img.shields.io)
-
 !\[Language](https://img.shields.io)
 
+!\[Author](https://img.shields.io)
 
 
 
-
-A professional command-line music player built with \*\*C\*\*, \*\*FFmpeg\*\* for decoding, and \*\*SDL2\*\* for audio playback.
+A high-performance command-line music player built with \*\*C\*\*, \*\*FFmpeg\*\* for decoding, and \*\*SDL2\*\* for audio playback.
 
 
 
@@ -32,9 +30,9 @@ A professional command-line music player built with \*\*C\*\*, \*\*FFmpeg\*\* fo
 
 \## 🛠️ Requirements
 
-\- FFmpeg (avcodec, avformat, avutil, swresample)
+\- \[FFmpeg](https://ffmpeg.org) (avcodec, avformat, avutil, swresample)
 
-\- SDL2
+\- \[SDL2](https://www.libsdl.org)
 
 \- MinGW-w64 (64-bit)
 
@@ -57,20 +55,6 @@ A professional command-line music player built with \*\*C\*\*, \*\*FFmpeg\*\* fo
 ```cmd
 
 my\_player.exe <path\_to\_music\_file.mp3>
-
-
-
----
-
-\## 👨‍💻 Author
-
-\- \*\*Name:\*\* \*\*Rahul Kawadkar\*\*
-
-\- \*\*GitHub:\*\* \[Rahul](https://github.com/RahullKawadkar/C-FFmpeg-MusicPlayer)
-
-\- \*\*Project:\*\* C-Music Player (FFmpeg + SDL2)
-
-
 
 
 
