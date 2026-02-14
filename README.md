@@ -1,5 +1,7 @@
 \# 🎵 C-Music Player (FFmpeg + SDL2)
 
+\### Developed by \[Rahul Kawadkar](https://github.com) 🚀
+
 
 
 [https://img.shields.io/C_Music_Player-blue](https://img.shields.io/badge/C_Music_Player-blue
@@ -29,19 +31,7 @@ A high-performance command-line music player built with \*\*C\*\*, \*\*FFmpeg\*\
 
 
 
-\## 🛠️ Requirements
-
-\- \[FFmpeg](https://ffmpeg.org) (avcodec, avformat, avutil, swresample)
-
-\- \[SDL2](https://www.libsdl.org)
-
-\- MinGW-w64 (64-bit)
-
-\- CMake
-
-
-
-\## 🚀 How to Build
+\## 🚀 How to Build \& Run
 
 1\. Create a build folder: `mkdir build \&\& cd build`
 
@@ -49,13 +39,19 @@ A high-performance command-line music player built with \*\*C\*\*, \*\*FFmpeg\*\
 
 3\. Compile: `mingw32-make`
 
+4\. Run: `my\_player.exe <path\_to\_music\_file.mp3>`
 
 
-\## 🎧 Usage
 
-```cmd
+---
 
-my\_player.exe <path\_to\_music\_file.mp3>
+\## 👨‍💻 Author Info
+
+\- \*\*Name:\*\* Rahul Kawadkar
+
+\- \*\*GitHub Profile:\*\* \[RahullKawadkar](https://github.com)
+
+\- \*\*Project Repo:\*\* \[C-FFmpeg-MusicPlayer](https://github.com/C-FFmpeg-MusicPlayer)
 
 
 
