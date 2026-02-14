@@ -2,7 +2,8 @@
 
 
 
-!\[Language](https://img.shields.io/C_Music_Player-blue)
+!\[Language]([https://img.shields.io/C_Music_Player-blue](https://img.shields.io/badge/C_Music_Player-blue
+))
 
 !\[Author](https://img.shields.io)
 
