@@ -3,8 +3,7 @@
 
 ![Language](https://img.shields.io/badge/C-green)
 
-![Author](https://img.shields.io/badge/Author-Rahul_Kawadkar-blue%3Flogo%3Dgithub
-)
+
 
 A high-performance command-line music player built with **C**, **FFmpeg** for decoding, and **SDL2** for audio playback.
 
@@ -24,5 +23,6 @@ A high-performance command-line music player built with **C**, **FFmpeg** for de
 
 ---
 ## 👨‍💻 Author Info
-- **Name:** Rahul Kawadkar
+- ![Author](https://img.shields.io/badge/Author%20%3A-Rahul_Kawadkar-blue
+)
 - **GitHub Profile:** [RahullKawadkar](https://github.com)
