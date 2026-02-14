@@ -1,9 +1,10 @@
 # 🎵 C-Music Player (FFmpeg + SDL2)
 ### Developed by [Rahul Kawadkar](https://github.com) 🚀
 
-![Language](https://img.shields.io/badge/C-blue)
+![Language](https://img.shields.io/badge/C-green)
 
-![Author](https://img.shields.io^logo=github)
+![Author](https://img.shields.io/badge/Author-Rahul_Kawadkar-blue%3Flogo%3Dgithub
+)
 
 A high-performance command-line music player built with **C**, **FFmpeg** for decoding, and **SDL2** for audio playback.
 
