@@ -7,12 +7,15 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s <filename>\n", argv);
+        fprintf(stderr, "Usage: my_player.exe <filename>\n");
         return -1;
     }
 
+int64_t accumulated_samples = 0; // Ginti rakhega kitne samples baj gaye
+
     // 1. FFmpeg Setup
     AVFormatContext* pFormatCtx = NULL;
+    av_log_set_level(AV_LOG_ERROR);
     if (avformat_open_input(&pFormatCtx, argv[1], NULL, NULL) != 0) return -1;
     avformat_find_stream_info(pFormatCtx, NULL);
 
@@ -113,8 +116,19 @@ int main(int argc, char* argv[]) {
         // --- STEP E: Decoding ---
         if (av_read_frame(pFormatCtx, &packet) >= 0) {
             if (packet.stream_index == audioStream) {
-                if (avcodec_send_packet(pCodecCtx, &packet) == 0) {
+                if (avcodec_send_packet(pCodecCtx, &packet) == 0) { 
+
+double time_base = av_q2d(pFormatCtx->streams[audioStream]->time_base);
+double total_duration = pFormatCtx->duration / (double)AV_TIME_BASE;
+double current_time = pFrame->pts *time_base;
+
+
                     while (avcodec_receive_frame(pCodecCtx, pFrame) == 0) {
+
+                         accumulated_samples += pFrame->nb_samples;
+
+  double current_time = (double)accumulated_samples / (double)pCodecCtx->sample_rate;
+    double total_duration = pFormatCtx->duration / (double)AV_TIME_BASE;
                         
                         uint8_t* out_buffer = NULL;
                         int out_samples = av_rescale_rnd(swr_get_delay(swr_ctx, pCodecCtx->sample_rate) + pFrame->nb_samples, 
@@ -130,6 +144,13 @@ int main(int argc, char* argv[]) {
 
                         SDL_QueueAudio(device, out_buffer, size);
                         av_freep(&out_buffer);
+
+                        printf("\rPlaying: [%02d:%02d / %02d:%02d] Volume: %.0f%%   ", 
+            (int)current_time/60, (int)current_time%60, 
+            (int)total_duration/60, (int)total_duration%60,
+            volume * 100);
+    fflush(stdout);
+                        
                     }
                 }
             }
