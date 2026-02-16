@@ -1,0 +1,27 @@
+#ifndef AUDIO_ENGINE_H
+#define AUDIO_ENGINE_H
+
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libswresample/swresample.h>
+#include <SDL2/SDL.h>
+
+// Engine states
+
+typedef struct {
+
+int is_running;
+int is_paused;
+float volume;
+char *current_song_path;
+
+} PlayerState;
+
+//Functions for main.c to call
+
+int init_audio_engine();
+void play_song(const char* path);
+void stop_audio();
+void cleanup_audio_engine();
+
+#endif

@@ -17,6 +17,8 @@ link_directories(${VCPKG_PATH}/lib)
 add_executable(my_player_v2 
     src/main.c 
     src/file_manager.c
+    src/ui_manager.c
+    src/audio_engine.c
     # Agle modules: src/audio_engine.c src/ui_manager.c
 )
 
