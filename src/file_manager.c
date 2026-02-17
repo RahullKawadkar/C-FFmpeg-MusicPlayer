@@ -1,4 +1,5 @@
 #include "file_manager.h"
+#include "ui_manager.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +8,15 @@
 
 Song playlist[MAX_SONGS];
 int song_count = 0;
+
+
+void add_custom_folder() {
+    char path[MAX_PATH];
+    printf(COLOR_YELLOW "\nEnter custom folder path: " COLOR_RESET);
+    scanf("%s", path);
+    scan_directory(path);
+}
+
 
 // 1. Windows se "User Profile" mangwane ka logic
 void get_default_music_path(char* out_path) {
