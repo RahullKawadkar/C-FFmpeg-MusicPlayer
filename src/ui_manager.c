@@ -92,4 +92,43 @@ void update_timer_only() {
     fflush(stdout); 
 }
 
+void show_outro_animation() {
+    system("cls");
+    printf("\033[?25l"); // Cursor hide karo
+    
+    // Center mein aane ke liye thode gaps
+    for(int i=0; i<5; i++) printf("\n");
+
+    const char* lines[] = {
+        "       __________________________________________       ",
+        "      |                                          |      ",
+        "      |        THANK YOU FOR USING C-MUSIC       |      ",
+        "      |              PLAYER v2.0                 |      ",
+        "      |__________________________________________|      ",
+        "                                                        ",
+        "                MADE WITH <3 BY RAHUL                   ",
+        "           ________________________________             "
+    };
+
+    // Animation Loop: Rang badalte huye (Cyan -> White -> Cyan)
+    for(int flash=0; flash<2; flash++) {
+        printf("\033[H"); // Top par jao overwrite karne ke liye
+        for(int i=0; i<5; i++) printf("\n"); // Wahi vertical gap
+
+        const char* color = (flash % 2 == 0) ? COLOR_CYAN : COLOR_YELLOW;
+        
+        for(int i=0; i<8; i++) {
+            printf("%s%s%s\n", color, BOLD, lines[i]);
+            Sleep(50); // Dheere-dheere chhapne ka feel
+        }
+        Sleep(500); // Thoda ruk kar chamko
+    }
+
+    printf(COLOR_RESET);
+    printf(COLOR_RED "\n\n                 Exiting Gracefully...\n\n"COLOR_RESET);
+    Sleep(3000);
+    printf("\033[?25h"); // Cursor wapas dikhao (System stability ke liye)
+}
+
+
 

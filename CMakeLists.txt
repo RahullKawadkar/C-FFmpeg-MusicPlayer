@@ -25,8 +25,8 @@ add_executable(my_player_v2
 # Static linking for portability
 set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
 
-# Pehle target link libraries ka kachra saaf karo aur ye dalo
 target_link_libraries(my_player_v2 
+    PRIVATE
     mingw32 #
     SDL2main 
     SDL2 

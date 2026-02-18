@@ -139,6 +139,7 @@ case 'p': case 'P': // PREVIOUS SONG
     // 3. Final Exit Cleanup
     stop_audio();
     cleanup_audio_engine();
+    show_outro_animation(); 
     printf("\033[?25h"); // Cursor wapas dikhao exit par
     return 0;
 }
