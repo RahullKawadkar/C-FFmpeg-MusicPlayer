@@ -93,6 +93,29 @@ int main(int argc, char* argv[]) {
                     case 'l': case 'L': seek_audio(10.0); needs_update = 1; break;
                     case 'j': case 'J': seek_audio(-10.0); needs_update = 1; break;
                     case 'q': case 'Q': is_running = 0; break;
+
+case 'n': case 'N': // NEXT SONG
+    if (entry_count > 0) {
+        selected_index = (selected_index + 1) % entry_count; // Circular logic
+        // Agar folder nahi hai toh play karo
+        if (!browser_list[selected_index].is_directory) {
+            play_song(browser_list[selected_index].path, browser_list[selected_index].name);
+            needs_update = 1;
+        }
+    }
+    break;
+
+
+case 'p': case 'P': // PREVIOUS SONG
+    if (entry_count > 0) {
+        selected_index = (selected_index - 1 + entry_count) % entry_count; // Reverse Circular
+        if (!browser_list[selected_index].is_directory) {
+            play_song(browser_list[selected_index].path, browser_list[selected_index].name);
+            needs_update = 1;
+        }
+    }
+    break;
+
                 }
             }
         }

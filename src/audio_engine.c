@@ -148,8 +148,10 @@ cleanup:
 // Baki functions sahi hain...
 void play_song(const char* path, const char* name) {
     stop_audio(); 
+    player_state.current_time = 0;
     player_state.is_running = 1;
     player_state.is_paused = 0;
+    seek_target = -1.0; // Seek reset
     if (name) strncpy(player_state.current_song_name, name, 256);
     audio_thread = SDL_CreateThread(audio_thread_func, "AudioThread", (void*)path);
 }
