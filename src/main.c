@@ -90,6 +90,8 @@ int main(int argc, char* argv[]) {
                     case 'b': case 'B': current_state = 0; needs_update = 1; break; // Back to Folders
                     case '+': case '=': player_state.volume = (player_state.volume < 0.95f) ? player_state.volume + 0.05f : 1.0f; break;
                     case '-': case '_': player_state.volume = (player_state.volume > 0.05f) ? player_state.volume - 0.05f : 0.0f; break;
+                    case 'l': case 'L': seek_audio(10.0); needs_update = 1; break;
+                    case 'j': case 'J': seek_audio(-10.0); needs_update = 1; break;
                     case 'q': case 'Q': is_running = 0; break;
                 }
             }

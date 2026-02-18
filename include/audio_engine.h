@@ -26,6 +26,7 @@ double total_duration;
 int init_audio_engine();
 void play_song(const char* path, const char* name);
 void stop_audio();
+void seek_audio(double seconds);
 void cleanup_audio_engine();
 
 #endif
