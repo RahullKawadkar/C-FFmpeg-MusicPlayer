@@ -4,47 +4,131 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
-#include <windows.h> // Windows API ke liye zaroori hai
+#include <windows.h>
 
-Song playlist[MAX_SONGS];
-int song_count = 0;
+// 1. Global Variables (Jo Linker dhoond raha hai)
+FileEntry browser_list[MAX_SONGS];
+int entry_count = 0;
+char found_music_folders[MAX_FOLDERS][MAX_FILE_PATH];
+int found_folder_count = 0;
 
+// 2. Animation Logic
+void discover_animation() {
+    system("cls");
+    printf("\033[H\033[?25l"); 
 
-void add_custom_folder() {
-    char path[MAX_PATH];
-    printf(COLOR_YELLOW "\nEnter custom folder path: " COLOR_RESET);
-    scanf("%s", path);
-    scan_directory(path);
-}
-
-
-// 1. Windows se "User Profile" mangwane ka logic
-void get_default_music_path(char* out_path) {
-    // USERPROFILE environment variable se "C:\Users\Name" milta hai
-    char* user_profile = getenv("USERPROFILE");
-    if (user_profile != NULL) {
-        sprintf(out_path, "%s\\Music", user_profile);
-    } else {
-        strcpy(out_path, "C:\\"); // Fallback agar kuch na mile
+    printf("\n" COLOR_CYAN BOLD "\n   (O_-) Searching for Audio files");
+    for(int i=0; i<6; i++) {
+        printf(".");
+        fflush(stdout);
+        Sleep(200);
     }
+
+    printf("\r\033[2K"); 
+    fflush(stdout);
+    system("cls");
 }
 
-// 2. Folder scan karke sirf .mp3 uthane ka logic
+// 3. Scan Logic (Folders aur Files dono ke liye)
 void scan_directory(const char* dir_path) {
     struct dirent *entry;
     DIR *dp = opendir(dir_path);
+    entry_count = 0; // <--- Sabse zaroori: Purani list (Folders) ko saaf karo
 
     if (dp == NULL) return;
 
-    while ((entry = readdir(dp)) != NULL && song_count < MAX_SONGS) {
-        // Sirf .mp3 aur .wav files dhoondo
+    while ((entry = readdir(dp)) != NULL && entry_count < MAX_SONGS) {
+        if (entry->d_name[0] == '.') continue; // Hidden files skip karo
+
+        // Sirf .mp3 aur .wav files ko browser_list mein dalo
         if (strstr(entry->d_name, ".mp3") || strstr(entry->d_name, ".wav")) {
-            // Poora path (folder + filename)
-            snprintf(playlist[song_count].path, MAX_PATH, "%s\\%s", dir_path, entry->d_name);
-            // Sirf dikhane ke liye naam
-            strncpy(playlist[song_count].name, entry->d_name, 256);
-            song_count++;
+            browser_list[entry_count].is_directory = 0; // Ye ab gaana hai
+            strncpy(browser_list[entry_count].name, entry->d_name, 256);
+            snprintf(browser_list[entry_count].path, MAX_FILE_PATH, "%s\\%s", dir_path, entry->d_name);
+            entry_count++;
         }
     }
     closedir(dp);
 }
+
+
+// 4. Auto Discovery (Jo humne pehle discuss kiya tha)
+
+// 5. Custom Path Function
+void add_custom_folder() {
+    char path[MAX_FILE_PATH];
+    printf("\nEnter full folder path: ");
+    fflush(stdin);
+    fgets(path, MAX_FILE_PATH, stdin);
+    path[strcspn(path, "\n")] = 0;
+    scan_directory(path);
+}
+
+
+// Helper function: Kya is folder mein gaane hain?
+int folder_has_audio(const char* dir_path) {
+    char search_pattern[MAX_FILE_PATH];
+    snprintf(search_pattern, MAX_FILE_PATH, "%s\\*", dir_path);
+
+    WIN32_FIND_DATA findData;
+    HANDLE hFind = FindFirstFile(search_pattern, &findData);
+
+    if (hFind == INVALID_HANDLE_VALUE) return 0;
+
+    do {
+        if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+            if (strstr(findData.cFileName, ".mp3") || strstr(findData.cFileName, ".wav")) {
+                FindClose(hFind);
+                return 1; // Mil gaya!
+            }
+        }
+    } while (FindNextFile(hFind, &findData));
+
+    FindClose(hFind);
+    return 0;
+}
+
+// Asli Recursive Scanner
+void crawl_drives(const char* base_path, int depth) {
+    if (depth > 3 || found_folder_count >= MAX_FOLDERS) return; // Zyada gehra mat jao (Speed ke liye)
+
+    if (folder_has_audio(base_path)) {
+        strncpy(found_music_folders[found_folder_count++], base_path, MAX_FILE_PATH);
+        return; // Is folder ka kaam ho gaya
+    }
+
+    char search_pattern[MAX_FILE_PATH];
+    snprintf(search_pattern, MAX_FILE_PATH, "%s\\*", base_path);
+
+    WIN32_FIND_DATA findData;
+    HANDLE hFind = FindFirstFile(search_pattern, &findData);
+
+    if (hFind != INVALID_HANDLE_VALUE) {
+        do {
+            if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
+                strcmp(findData.cFileName, ".") != 0 && strcmp(findData.cFileName, "..") != 0) {
+                
+                char next_path[MAX_FILE_PATH];
+                snprintf(next_path, MAX_FILE_PATH, "%s\\%s", base_path, findData.cFileName);
+                crawl_drives(next_path, depth + 1); // Agle level par jao
+            }
+        } while (FindNextFile(hFind, &findData));
+        FindClose(hFind);
+    }
+}
+
+void deep_discover_music() {
+    found_folder_count = 0;
+    discover_animation();
+
+    // In rasto se shuruat karo
+    crawl_drives("D:", 0);
+    crawl_drives("E:", 0);
+    char* user_music = getenv("USERPROFILE");
+    if(user_music) {
+        char music_dir[MAX_FILE_PATH];
+        snprintf(music_dir, MAX_FILE_PATH, "%s\\Music", user_music);
+        crawl_drives(music_dir, 0);
+    }
+}
+
