@@ -136,6 +136,9 @@ int audio_thread_func(void *data) {
         SDL_Delay(1); 
     }
 
+player_state.current_time = player_state.total_duration; 
+player_state.playback_finished = 1;
+
 cleanup:
     if (pFrame) av_frame_free(&pFrame);
     if (swr_ctx) swr_free(&swr_ctx);

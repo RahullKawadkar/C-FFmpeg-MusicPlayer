@@ -17,6 +17,7 @@ char *current_song_path;
 char current_song_name[256];
 double current_time;
 double total_duration;
+int playback_finished;
 
 } PlayerState;
 

@@ -59,6 +59,20 @@ int main(int argc, char* argv[]) {
             }
         }
 
+if (player_state.playback_finished && !player_state.is_paused) {
+    player_state.playback_finished = 0; // Reset karo
+    
+    // Agla gaana dhundo (Circular Logic)
+    selected_index = (selected_index + 1) % entry_count;
+    
+    // Check karo ki wo folder toh nahi
+    if (!browser_list[selected_index].is_directory) {
+        play_song(browser_list[selected_index].path, browser_list[selected_index].name);
+        needs_update = 1;
+    }
+}
+
+
         // --- ⌨️ NON-BLOCKING INPUT HANDLING ---
         if (_kbhit()) {
             int ch = _getch();
@@ -87,7 +101,7 @@ int main(int argc, char* argv[]) {
                         }
                         break;
                     case ' ': player_state.is_paused = !player_state.is_paused; break;
-                    case 'b': case 'B': current_state = 0; needs_update = 1; break; // Back to Folders
+                    case 'b': case 'B': system("cls"); current_state = 0; needs_update = 1; break; // Back to Folders
                     case '+': case '=': player_state.volume = (player_state.volume < 0.95f) ? player_state.volume + 0.05f : 1.0f; break;
                     case '-': case '_': player_state.volume = (player_state.volume > 0.05f) ? player_state.volume - 0.05f : 0.0f; break;
                     case 'l': case 'L': seek_audio(10.0); needs_update = 1; break;
