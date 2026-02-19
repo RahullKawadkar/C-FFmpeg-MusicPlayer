@@ -137,9 +137,7 @@ int audio_thread_func(void *data) {
         av_packet_unref(&packet);
     }
 
-    // 🔴 IMPORTANT: Yahan se wo 'playback_finished = 1' hata diya jo loop ke bahar tha.
-    // Kyunki agar user 'Stop' karta hai, toh hum signal nahi bhejna chahte.
-
+    
 cleanup:
     if (pFrame) av_frame_free(&pFrame);
     if (swr_ctx) swr_free(&swr_ctx);
@@ -164,6 +162,7 @@ void play_song(const char* path, const char* name) {
     if (name) strncpy(player_state.current_song_name, name, 256);
     
     // Path ko duplicate karo kyunki thread async chalta hai
+
     char *path_copy = strdup(path); 
     
     audio_thread = SDL_CreateThread(audio_thread_func, "AudioThread", (void*)path_copy);

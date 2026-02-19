@@ -11,7 +11,6 @@ void init_terminal() {
     DWORD dwMode = 0;
     GetConsoleMode(hOut, &dwMode);
     
-    // Windows 10+ mein ANSI mode enable karna [Microsoft Docs](https://learn.microsoft.com)
     dwMode |= 0x0004; 
     SetConsoleMode(hOut, dwMode);
     
@@ -24,7 +23,6 @@ void clear_screen() {
 }
 
 void update_timer_only() {
-    // 🎯 Sniper Position: Line 15 par jao (Jahan progress bar hai)
     printf("\033[15;1H\033[?25l"); 
 
     char buffer[128]; 
@@ -32,13 +30,11 @@ void update_timer_only() {
     int progress = (player_state.total_duration > 0) ? 
                    (int)((player_state.current_time / player_state.total_duration) * bar_width) : 0;
 
-    // 🛠️ Buffer build karo (Flicker-free logic)
     int pos = sprintf(buffer, COLOR_CYAN " Progress: [" COLOR_RESET);
     for (int i = 0; i < bar_width; i++) {
         buffer[pos++] = (i < progress) ? '#' : '-';
     }
     
-    // Time format jodd do
     sprintf(buffer + pos, COLOR_CYAN "] %02d:%02d / %02d:%02d \033[K" COLOR_RESET, 
            (int)player_state.current_time/60, (int)player_state.current_time%60,
            (int)player_state.total_duration/60, (int)player_state.total_duration%60);
@@ -80,7 +76,6 @@ void draw_dashboard(int selected_index, float volume, int is_paused, int start_i
             char display_line[64];
             char *prefix = browser_list[idx].is_directory ? "[DIR] " : "      ";
             
-            // 🎯 FIX 3: Song name clipping taaki auto-scroll trigger na ho
             snprintf(display_line, 54, "%s%-46.46s", prefix, browser_list[idx].name);
             
             if (idx == selected_index) 
@@ -88,7 +83,6 @@ void draw_dashboard(int selected_index, float volume, int is_paused, int start_i
             else 
                 printf("   %-54s \n", display_line);
         } else {
-            // Khali lines taaki footer hamesha apni jagah rahe
             printf("%-58s\n", ""); 
         }
     }
@@ -130,7 +124,6 @@ void show_outro_animation() {
         "           ________________________________             "
     };
 
-    // Animation Loop: Rang badalte huye (Cyan -> White -> Cyan)
     for(int flash=0; flash<2; flash++) {
         printf("\033[H"); // Top par jao overwrite karne ke liye
         for(int i=0; i<5; i++) printf("\n"); // Wahi vertical gap
@@ -147,7 +140,7 @@ void show_outro_animation() {
     printf(COLOR_RESET);
     printf(COLOR_RED "\n\n                 Exiting Gracefully...\n\n"COLOR_RESET);
     Sleep(3000);
-    printf("\033[?25h"); // Cursor wapas dikhao (System stability ke liye)
+    printf("\033[?25h"); 
 }
 
 

@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
             last_sec = current_sec;
         }
 
-        // --- 🎯 AUTO-PLAY NEXT LOGIC (FIXED) ---
+        // --- AUTO-PLAY NEXT LOGIC (FIXED) ---
         // 'current_time - last_skip_time > 1000' ye check karta hai ki 1 sec mein do baar skip na ho
         if (current_state == 1 && player_state.playback_finished && (current_time - last_skip_time > 1000)) {
             
