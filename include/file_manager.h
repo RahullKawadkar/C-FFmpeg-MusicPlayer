@@ -15,8 +15,6 @@ typedef struct {
 
 extern FileEntry browser_list[MAX_SONGS];
 extern int entry_count;
-
-// --- NAYA: Folders ke liye ---
 extern char found_music_folders[MAX_FOLDERS][MAX_FILE_PATH];
 extern int found_folder_count;
 

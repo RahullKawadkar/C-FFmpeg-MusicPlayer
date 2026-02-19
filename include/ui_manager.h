@@ -33,6 +33,8 @@ void draw_header();
 void move_cursor(int row, int col);
 void update_timer_only(); 
 void show_outro_animation();
-void draw_dashboard(int selected_index, float volume, int is_paused);
+void draw_dashboard(int selected_index, float volume, int is_paused, int start_idx);
+
+//extern int start_idx; 
 
 #endif

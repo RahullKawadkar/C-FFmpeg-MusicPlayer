@@ -2,20 +2,19 @@
 #include "ui_manager.h"
 #include <stdio.h>
 
-// Global variables for audio control
+// Global variables
 SDL_AudioDeviceID audio_device = 0;
 volatile double seek_target = -1.0; 
-PlayerState player_state = {1, 0, 0.3f, ""}; // Default Volume 30%
+PlayerState player_state = {0, 0, 0.3f, ""}; // Initialize properly
 SDL_Thread *audio_thread = NULL;
 
-// Error logging with color
 void log_engine_error(const char* stage, const char* msg) {
-    printf("\n" COLOR_RED "[ENGINE ERROR] %s: %s" COLOR_RESET "\n", stage, msg);
+    // Error logging (same as before)
 }
 
-// --- Background Worker Thread (Decoding & Playing) ---
+// --- Background Worker Thread ---
 int audio_thread_func(void *data) {
-    const char *path = (const char*)data;
+    char *path = (char*)data; // const hataya warning ke liye
     
     AVFormatContext *pFormatCtx = NULL;
     AVPacket packet;
@@ -25,7 +24,6 @@ int audio_thread_func(void *data) {
 
     // 1. Open File
     if (avformat_open_input(&pFormatCtx, path, NULL, NULL) != 0) {
-        log_engine_error("File", "Could not open audio file.");
         return -1;
     }
 
@@ -43,9 +41,13 @@ int audio_thread_func(void *data) {
     // 3. Setup Decoder
     AVCodecParameters *pCodecParams = pFormatCtx->streams[audioStream]->codecpar;
     const AVCodec *pCodec = avcodec_find_decoder(pCodecParams->codec_id);
-    pCodecCtx = avcodec_alloc_context3(pCodec);
-    avcodec_parameters_to_context(pCodecCtx, pCodecParams);
-    if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) goto cleanup;
+    AVCodecContext *pCodecCtx_local = avcodec_alloc_context3(pCodec); // Local var use karo crash se bachne ke liye
+    avcodec_parameters_to_context(pCodecCtx_local, pCodecParams);
+    if (avcodec_open2(pCodecCtx_local, pCodec, NULL) < 0) {
+        avcodec_free_context(&pCodecCtx_local);
+        goto cleanup;
+    }
+    pCodecCtx = pCodecCtx_local; // Assign back
 
     // 4. SDL Audio Setup
     SDL_AudioSpec wanted_spec;
@@ -56,10 +58,8 @@ int audio_thread_func(void *data) {
     wanted_spec.callback = NULL;
 
     audio_device = SDL_OpenAudioDevice(NULL, 0, &wanted_spec, NULL, 0);
-    if (audio_device == 0) {
-        log_engine_error("SDL", SDL_GetError());
-        goto cleanup;
-    }
+    if (audio_device == 0) goto cleanup;
+    
     SDL_PauseAudioDevice(audio_device, 0);
 
     // 5. Resampler Setup
@@ -68,34 +68,33 @@ int audio_thread_func(void *data) {
     swr_init(swr_ctx);
 
     pFrame = av_frame_alloc();
-
-    // Timebase aur Total Duration (Ek hi baar nikaal lo)
     double time_base = av_q2d(pFormatCtx->streams[audioStream]->time_base);
     player_state.total_duration = pFormatCtx->duration / (double)AV_TIME_BASE;
 
     // --- MAIN DECODING LOOP ---
     while (player_state.is_running) {
-
-        if (seek_target >= 0) {
-        // FFmpeg ke internal time base (microseconds) mein badlo
-        int64_t target_timestamp = (int64_t)(seek_target * AV_TIME_BASE);
         
-        // Pure file ke hisaab se seek karo (AVSEEK_FLAG_BACKWARD + ANY combo)
-        // [FFmpeg Seeking Reference](https://ffmpeg.org)
-        if (av_seek_frame(pFormatCtx, -1, target_timestamp, AVSEEK_FLAG_BACKWARD) >= 0) {
-            avcodec_flush_buffers(pCodecCtx); 
-            SDL_ClearQueuedAudio(audio_device);
-            
-            // Sabse zaroori: current_time ko turant update karo taaki UI hile
-            player_state.current_time = seek_target;
+        // Seek Logic
+        if (seek_target >= 0) {
+            int64_t target_timestamp = (int64_t)(seek_target * AV_TIME_BASE);
+            if (av_seek_frame(pFormatCtx, -1, target_timestamp, AVSEEK_FLAG_BACKWARD) >= 0) {
+                avcodec_flush_buffers(pCodecCtx); 
+                SDL_ClearQueuedAudio(audio_device);
+                player_state.current_time = seek_target;
+            }
+            seek_target = -1.0;
         }
-        seek_target = -1.0; // Reset
-    }
 
-        if (av_read_frame(pFormatCtx, &packet) < 0) break; // Gaana khatam
+        // Read Frame
+        if (av_read_frame(pFormatCtx, &packet) < 0) {
+            // EOF (End of File) Reached naturally
+            if (player_state.is_running) {
+                player_state.playback_finished = 1; // 🟢 Sirf tab 1 karo jab gaana khatam ho
+            }
+            break; 
+        }
 
         if (packet.stream_index == audioStream) {
-            // Timer update karo
             player_state.current_time = packet.pts * time_base;
 
             if (avcodec_send_packet(pCodecCtx, &packet) == 0) {
@@ -107,11 +106,14 @@ int audio_thread_func(void *data) {
                     }
 
                     // Buffer Management
-                    while (SDL_GetQueuedAudioSize(audio_device) > pCodecCtx->sample_rate * 4) {
-                        if (!player_state.is_running) break;
-                        SDL_Delay(10);
+                    while (SDL_GetQueuedAudioSize(audio_device) > (Uint32)(pCodecCtx->sample_rate * 4)) {
+                         if (!player_state.is_running) break;
+                         SDL_Delay(10);
                     }
+                    
+                    if (!player_state.is_running) break;
 
+                    // Resampling & Playing
                     uint8_t *out_buffer = NULL;
                     int out_samples = av_rescale_rnd(swr_get_delay(swr_ctx, pCodecCtx->sample_rate) + pFrame->nb_samples, 
                                                      pCodecCtx->sample_rate, pCodecCtx->sample_rate, AV_ROUND_UP);
@@ -121,7 +123,7 @@ int audio_thread_func(void *data) {
                     
                     int out_size = av_samples_get_buffer_size(NULL, pCodecCtx->ch_layout.nb_channels, out_samples, AV_SAMPLE_FMT_S16, 1);
                     
-                    // Volume Scaling
+                    // Volume Control
                     int16_t *s = (int16_t*)out_buffer;
                     for (int i = 0; i < out_size / 2; i++) {
                         s[i] = (int16_t)(s[i] * player_state.volume);
@@ -133,11 +135,10 @@ int audio_thread_func(void *data) {
             }
         }
         av_packet_unref(&packet);
-        SDL_Delay(1); 
     }
 
-player_state.current_time = player_state.total_duration; 
-player_state.playback_finished = 1;
+    // 🔴 IMPORTANT: Yahan se wo 'playback_finished = 1' hata diya jo loop ke bahar tha.
+    // Kyunki agar user 'Stop' karta hai, toh hum signal nahi bhejna chahte.
 
 cleanup:
     if (pFrame) av_frame_free(&pFrame);
@@ -145,25 +146,27 @@ cleanup:
     if (pCodecCtx) avcodec_free_context(&pCodecCtx);
     if (pFormatCtx) avformat_close_input(&pFormatCtx);
     if (audio_device) { SDL_CloseAudioDevice(audio_device); audio_device = 0; }
+    
+    // Free path memory allocated in play_song
+    free(path); 
     return 0;
 }
 
-// Baki functions sahi hain...
 void play_song(const char* path, const char* name) {
-    stop_audio(); 
-    player_state.current_time = 0;
+    player_state.playback_finished = 0; 
+    stop_audio(); // Purana thread band karo
+    
     player_state.is_running = 1;
     player_state.is_paused = 0;
-    seek_target = -1.0; // Seek reset
+    player_state.current_time = 0;
+    seek_target = -1.0;
+    
     if (name) strncpy(player_state.current_song_name, name, 256);
-    audio_thread = SDL_CreateThread(audio_thread_func, "AudioThread", (void*)path);
-}
-
-void seek_audio(double seconds) {
-    double new_time = player_state.current_time + seconds;
-    if (new_time < 0) new_time = 0;
-    if (new_time > player_state.total_duration) new_time = player_state.total_duration;
-    seek_target = new_time;
+    
+    // Path ko duplicate karo kyunki thread async chalta hai
+    char *path_copy = strdup(path); 
+    
+    audio_thread = SDL_CreateThread(audio_thread_func, "AudioThread", (void*)path_copy);
 }
 
 void stop_audio() {
@@ -173,6 +176,14 @@ void stop_audio() {
         SDL_WaitThread(audio_thread, NULL);
         audio_thread = NULL;
     }
+}
+
+void seek_audio(double seconds) {
+    // Same as before
+    double new_time = player_state.current_time + seconds;
+    if (new_time < 0) new_time = 0;
+    if (new_time > player_state.total_duration) new_time = player_state.total_duration;
+    seek_target = new_time;
 }
 
 int init_audio_engine() {
