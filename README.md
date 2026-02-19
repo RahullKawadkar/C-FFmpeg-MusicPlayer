@@ -62,11 +62,12 @@ mingw32-make
 ./my_player_v2.exe
 
 🤝 Acknowledgments
-FFmpeg Team for the incredible multimedia libraries.
 
-SDL Team for the robust audio handling.
+* FFmpeg Team for the incredible multimedia libraries.
 
-Inspired by a passion for low-level C programming.
+* SDL Team for the robust audio handling.
+
+* Inspired by a passion for low-level C programming.
 
 Made with ❤️ by Rahul Kawadkar
 
