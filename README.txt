@@ -1,43 +1,73 @@
-===========================================================
-     🎵 C-MUSIC PLAYER v2.0 - [ULTIMATE TUI EDITION] 🎵
-===========================================================
-             Developed by: RAHUL KAWADKAR
-        "Where Code Meets Music & Logic Meets Bass"
-===========================================================
+# 🎵 C-FFmpeg-MusicPlayer v2.1 (Stable)
+
+A high-performance, lightweight terminal-based music player built from scratch using **C**, **FFmpeg**, and **SDL2**. This project showcases low-level audio decoding, multi-threading, and optimized terminal UI rendering.
+
+![C-Music Player Demo](assets/Player_stable_v2.1.gif)
+
+---
+
+## 🚀 What's New in v2.1
+- **Flicker-Free UI:** Optimized terminal refresh using ANSI escape sequences (Removed `system("cls")` lag).
+- **Stable Auto-Play:** Improved signal synchronization between the audio engine and the main loop.
+- **Deep Discovery:** Efficiently scans `D:`, `E:`, and `User/Music` folders for audio files.
+- **Memory Management:** Fixed thread-leaks and implemented proper resource deallocation.
+
+---
+
+## ⌨️ Controls & Navigation
+
+| Key | Action |
+|-----|--------|
+| `Enter` | Select Folder / Play Song |
+| `Space` | Pause / Resume Playback |
+| `N` / `P` | Next / Previous Track |
+| `L` / `J` | Fast Forward / Rewind (10 seconds) |
+| `+/-` | Volume Up / Down |
+| `B` | Back to Folder Selection |
+| `Q` | Exit Gracefully |
+
+---
+
+## 🛠 Technical Architecture
+
+This player works by separating the concerns into three main modules:
+1. **File Manager:** Handles directory crawling and metadata scanning using Windows API.
+2. **Audio Engine:** Decodes compressed audio (MP3/WAV) into raw PCM using **FFmpeg** and manages the playback buffer via **SDL2**.
+3. **UI Manager:** Renders a responsive dashboard in the terminal using ANSI escape codes for a smooth experience.
 
 
---- ✨ FEATURES ---
 
-✅ AUTO-DISCOVERY: It can discover audio files form the computer!
-✅ ZERO-FLICKER: Used ANSI logic to make UI stable.
-✅ DEEP SCAN: I can deep scan and show all the folders with audio files.
-✅ SMART UI: Real-time Progress Bar and Volume Meter.
-✅ NAVIGATION: You can nevigate between the folders and enjoy music!
+---
 
---- 🎮 CONTROLS ---
+## 📦 Build Instructions
 
-▶️  ENTER        : Folder Select or Start Playing Music.
-⏸️  SPACE        : Pause/Play.
-📁  'B' or ESC   : Back to Folders List.
-🔊  F3 / '+'     : Volume UP.
-🔉  F2 / '-'     : Volume DOWN.
-⏩  'L'          : 10 Seconds FORWARD.
-⏪  'J'          : 10 Seconds BACKWARD.
-⏭️  'N'          : Next Song.
-⏮️  'P'          : Previous Song.
-❌  'Q'          : Quit with watermark.
+### Prerequisites
+- **Compiler:** MinGW-w64 (GCC)
+- **Libraries:** SDL2, FFmpeg (avcodec, avformat, swresample, avutil)
+- **Build Tool:** CMake 3.10+
 
---- 🛠️ TECHNICAL SPECS (For Nerds) ---
+### Compilation
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/RahullKawadkar/C-FFmpeg-MusicPlayer.git](https://github.com/RahullKawadkar/C-FFmpeg-MusicPlayer.git)
 
-- Engine: FFmpeg 6.0 (The Beast)
-- Graphics: Windows ANSI Console (Pure Logic)
-- Audio: SDL2 (Smooth Output)
-- Build: 100% Static & Portable Binary
+**Create a build directory:**
+mkdir build && cd build
 
---- 📝 NOTE ---
-Agar folder mein gaane nahi mil rahe, toh 'Searching...' ke baad
-Manual Path daalne ka option aayega—wahan apna Music path de sakte hai!
+**Generate build files and compile:**
+cmake ..
+mingw32-make
 
------------------------------------------------------------
-   (c) 2026 | RAHUL KAWADKAR | All Rights Reserved.
------------------------------------------------------------
+**Run player:**
+./my_player_v2.exe
+
+🤝 Acknowledgments
+FFmpeg Team for the incredible multimedia libraries.
+
+SDL Team for the robust audio handling.
+
+Inspired by a passion for low-level C programming.
+
+Made with ❤️ by Rahul Kawadkar
+
+
