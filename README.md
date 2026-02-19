@@ -1,10 +1,3 @@
-# 🎵 C-Music Player (FFmpeg + SDL2)
-### Developed by [Rahul Kawadkar](https://github.com) 🚀
-
-![Language](https://img.shields.io/badge/C-green)
-
-
-
 # 🎵 C-FFmpeg-MusicPlayer v2.1 (Stable)
 
 A high-performance, lightweight terminal-based music player built from scratch using **C**, **FFmpeg**, and **SDL2**. This project showcases low-level audio decoding, multi-threading, and optimized terminal UI rendering.
